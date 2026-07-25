@@ -4,7 +4,7 @@ import SignupContainer from '../components/signup/SignupContainer'
 import Footer from '../components/layout/Footer'
 const Signup = () => {
   return (
-    <div className="bg-[#eff5ec] flex flex-col items-center justify-center gap-4 py-6 ">
+    <div className="bg-surface min-h-screen flex flex-col items-center justify-between gap-6 px-6 ">
       <Logo />
       <SignupContainer />
       <Footer />

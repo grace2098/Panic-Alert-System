@@ -6,15 +6,15 @@ import SignupInputs from "./SignupInputs";
 import Google from "./Google";
 const SignupContainer = () => {
   return (
-    <div className="bg-white w-120 gap-4 rounded-xl flex flex-col items-center justify-center p-10">
+    <div className="bg-white w-full max-w-120 gap-4 rounded-xl flex flex-col items-center justify-center p-6 sm:p-10">
       <div className="flex flex-col items-center justify-center">
         <UserPlus
           size={30}
           strokeWidth={1.5}
           className="text-primary-container"
         />
-        <h2 className="text-2xl font-bold text-center">Create your Account</h2>
-        <p className="text-center text-gray-600">
+        <h2 className=" font-bold text-center text-title-md">Create your Account</h2>
+        <p className="text-center text-gray-600 text-sm">
           Join in and take control of your safety
         </p>
       </div>
