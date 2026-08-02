@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";
-import Contacts from "./pages/Contacts";
+
 
 const App = () => {
   return (
@@ -12,7 +12,7 @@ const App = () => {
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/profile" element={<Profile />} />
-      <Route path="/contacts" element={<Contacts />} />
+   
     </Routes>
   );
 }

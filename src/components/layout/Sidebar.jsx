@@ -16,7 +16,7 @@ import Logo from "./Logo";
 const NAV_ITEMS = [
   { label: "Dashboard", icon: LayoutDashboard, active: true, path: "/dashboard"  },
   { label: "Profile", icon: UserPlus, path: "/profile" },
-  { label: "Emergency Contacts", icon: Users, path: "/contacts" },
+
 ];
 
 export default function Sidebar({ open, onClose }) {
@@ -32,7 +32,7 @@ export default function Sidebar({ open, onClose }) {
       />
 
       <div
-        className={`fixed lg:sticky top-0 left-0 h-screen z-60 lg:z-40 flex flex-col p-md space-y-sm
+        className={`fixed lg:sticky top-0 left-0 h-screen z-60 lg:z-40 flex flex-col justify-center p-md space-y-sm
        bg-surface-container border-r border-outline-variant shadow-md w-full min-[780px]:w-72 lg:w-64
         transition-transform duration-300 lg:translate-x-0
         ${open ? "translate-x-0" : "-translate-x-full"}`}
@@ -44,7 +44,7 @@ export default function Sidebar({ open, onClose }) {
           <button
             type="button"
             onClick={onClose}
-            className="lg:hidden p-2 rounded-lg hover:bg-surface-variant"
+            className="lg:hidden p-2 absolute top-3 right-3 rounded-lg hover:bg-surface-variant"
             aria-label="Close menu"
           >
             <X className="w-6 h-6 text-on-surface" />

@@ -3,7 +3,7 @@ import { Menu } from 'lucide-react'
 
 const Header = ({ onMenuClick, writings }) => {
   return (
-    <div className="flex items-center justify-between w-full py-3 px-5 bg-surface border-r border-outline-variant shadow-md">
+    <div className="flex items-center justify-between w-full py-3 px-6 bg-surface border-r border-outline-variant shadow-md">
       <div className="flex items-center gap-3">
         <button
           type="button"
