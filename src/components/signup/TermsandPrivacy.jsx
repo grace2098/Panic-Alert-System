@@ -231,9 +231,9 @@ const TermsandPrivacy = () => {
   const [showPrivacy, setShowPrivacy] = useState(false);
 
   return (
-    <div className="flex items-center gap-2 text-gray-600 text-sm">
+    <div className="flex items-center justify-center gap-2 text-gray-600 text-sm">
       <input type="checkbox" />
-      <p className="text-sm">
+      <p className="text-xs">
         I agree to the{" "}
         <button
           type="button"

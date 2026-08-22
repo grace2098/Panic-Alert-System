@@ -78,7 +78,11 @@ export default function Sidebar({ open, onClose }) {
               className="flex items-center gap-md px-md py-sm text-on-surface-variant hover:text-error transition-all"
             >
               <LogOut className="w-4 h-4" />
-              <span className="text-label-md">Sign Out</span>
+              <NavLink
+                to="/login">
+              
+                <span className="text-label-md" >Sign Out</span>
+              </NavLink>
             </a>
           </div>
         </div>
