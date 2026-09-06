@@ -1,5 +1,5 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
   ShieldPlus,
   LayoutDashboard,
@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 // import SOSButton from "./SOSButton";
 import Logo from "./Logo";
+import { useAuth } from "../../context/AuthContext";
 
 const NAV_ITEMS = [
   { label: "Dashboard", icon: LayoutDashboard, active: true, path: "/dashboard"  },
@@ -20,6 +21,21 @@ const NAV_ITEMS = [
 ];
 
 export default function Sidebar({ open, onClose }) {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    try {
+      await logout();
+      // Navigate explicitly rather than relying on a redirect elsewhere --
+      // once currentUser goes null there's nothing else watching for it
+      // from here.
+      navigate("/login", { replace: true });
+    } catch (err) {
+      console.error("Sign out failed:", err);
+    }
+  };
+
   return (
     <div>
       <div
@@ -73,17 +89,14 @@ export default function Sidebar({ open, onClose }) {
 
         <div className="px-sm pb-md space-y-sm">
           <div className="pt-md border-t border-outline-variant">
-            <a
-              href="#"
-              className="flex items-center gap-md px-md py-sm text-on-surface-variant hover:text-error transition-all"
+            <button
+              type="button"
+              onClick={handleSignOut}
+              className="w-full flex items-center gap-md px-md py-sm text-on-surface-variant hover:text-error transition-all"
             >
               <LogOut className="w-4 h-4" />
-              <NavLink
-                to="/login">
-              
-                <span className="text-label-md" >Sign Out</span>
-              </NavLink>
-            </a>
+              <span className="text-label-md">Sign Out</span>
+            </button>
           </div>
         </div>
       </div>

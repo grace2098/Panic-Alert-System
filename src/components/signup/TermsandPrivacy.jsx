@@ -226,13 +226,20 @@ export const PrivacyModal = ({ onClose }) => (
   </div>
 );
 
-const TermsandPrivacy = () => {
+// `checked` / `onChange` are now controlled by the parent (SignupContainer)
+// so signup can actually require the box to be ticked before submitting --
+// previously this checkbox held no state at all, so nothing enforced it.
+const TermsandPrivacy = ({ checked, onChange }) => {
   const [showTerms, setShowTerms] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
 
   return (
     <div className="flex items-center justify-center gap-2 text-gray-600 text-sm">
-      <input type="checkbox" />
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+      />
       <p className="text-xs">
         I agree to the{" "}
         <button
