@@ -9,12 +9,16 @@ import { getDatabase } from "firebase/database";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDFEFdkyMQeFEz6t3mN_m2dMmdHtXpxNj8",
-  authDomain: "sentinoa-unn.firebaseapp.com",
-  projectId: "sentinoa-unn",
-  storageBucket: "sentinoa-unn.firebasestorage.app",
-  messagingSenderId: "278723352133",
-  appId: "1:278723352133:web:40dc654484a1691cc8f52c"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  // This was missing entirely before -- without it, Firebase guesses the
+  // legacy region-less URL, gets redirected to the real region, and that
+  // redirect handshake is what was hanging instead of completing.
+  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
 const app = initializeApp(firebaseConfig);
