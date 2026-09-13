@@ -12,7 +12,7 @@ const Dashboard = () => {
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
      <div className="w-full">
       <div className="fixed top-0 left-0 z-10 right-0 lg:left-62.5">
-          <Header onMenuClick={() => setSidebarOpen(true)} writings={["Hello Grace","Get all your security details in one go"]}/>
+          <Header onMenuClick={() => setSidebarOpen(true)} writings={["Hello","Get all your security details in one go"]}/>
         </div>
        <div className="pt-20 pb-35 lg:pt-24">
          <Dashboardcontainer />

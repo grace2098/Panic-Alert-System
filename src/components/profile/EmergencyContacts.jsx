@@ -38,7 +38,7 @@ function initials(name) {
     .join("");
 }
 
-const EmergencyContacts = ({ onAddContact }) => {
+const EmergencyContacts = ({ onAddContact, onEditContact }) => {
   const { currentUser } = useAuth();
   const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -53,8 +53,6 @@ const EmergencyContacts = ({ onAddContact }) => {
         const data = snapshot.val() || {};
         const list = Object.entries(data).map(([id, contact]) => ({ id, ...contact }));
 
-        // This sort IS the escalation order: tier first, then whenever they
-        // were added within the same tier.
         list.sort((a, b) => {
           if (a.priority !== b.priority) return a.priority - b.priority;
           return (a.addedAt || 0) - (b.addedAt || 0);
@@ -64,8 +62,6 @@ const EmergencyContacts = ({ onAddContact }) => {
         setLoading(false);
       },
       (err) => {
-        // Without this, a permission-denied or connectivity error leaves
-        // `loading` stuck true forever with no feedback at all.
         console.error("Failed to load emergency contacts:", err);
         toast.error("Couldn't load emergency contacts. Please refresh the page.");
         setLoading(false);
@@ -107,31 +103,33 @@ const EmergencyContacts = ({ onAddContact }) => {
           </p>
         )}
 
-        {contacts.map((contact, index) => (
-          <div
-            key={contact.id}
-            className={`flex gap-15 items-center py-6 ${
-              index < contacts.length - 1 ? "border-b border-outline-variant" : ""
-            }`}
-          >
+        {!loading &&
+          contacts.map((contact, index) => (
             <div
-              className={`w-10 h-10 rounded-full flex items-center justify-center ${avatarClass(
-                contact.id
-              )}`}
+              key={contact.id}
+              onClick={() => onEditContact(contact)}
+              className={`flex gap-15 items-center py-6 cursor-pointer hover:bg-black/5 rounded px-2 transition-colors ${
+                index < contacts.length - 1 ? "border-b border-outline-variant" : ""
+              }`}
             >
-              {initials(contact.name)}
-            </div>
-            <div className="flex flex-col gap-1">
-              <p>{contact.name}</p>
-              <div className="flex gap-1">
-                <p className="text-xs font-bold text-on-primary-fixed-variant">
-                  {priorityLabel(contact.priority)}
-                </p>
-                <p className="text-xs text-gray-600">{contact.phoneNumber}</p>
+              <div
+                className={`w-10 h-10 rounded-full flex items-center justify-center ${avatarClass(
+                  contact.id
+                )}`}
+              >
+                {initials(contact.name)}
+              </div>
+              <div className="flex flex-col gap-1">
+                <p className="font-semibold text-on-surface">{contact.name}</p>
+                <div className="flex gap-1">
+                  <p className="text-xs font-bold text-on-primary-fixed-variant">
+                    {priorityLabel(contact.priority)}
+                  </p>
+                  <p className="text-xs text-gray-600">{contact.phoneNumber}</p>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
       </div>
 
       <div>

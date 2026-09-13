@@ -5,7 +5,7 @@
 // avoids needing Firebase Storage (and its billing requirement) for
 // something as small as a profile picture.
 
-const MAX_DIMENSION = 300;
+const MAX_DIMENSION = 200;
 const JPEG_QUALITY = 0.7;
 
 export function resizeAndCompressImage(file) {

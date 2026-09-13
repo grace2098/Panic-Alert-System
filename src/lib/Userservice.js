@@ -1,4 +1,4 @@
-import { ref, get, update, push, serverTimestamp } from "firebase/database";
+import { ref, get, update, push, serverTimestamp, remove } from "firebase/database";
 import { db } from "./firebase";
 
 export function getUserProfile(uid) {
@@ -36,4 +36,17 @@ export function claimDevice(uid, deviceId) {
   updates[`devices/${deviceId}/ownerUid`] = uid;
   updates[`users/${uid}/deviceId`] = deviceId;
   return update(ref(db), updates);
+}
+export function updateEmergencyContact(uid, contactId, { name, phoneNumber, relationship, priority }) {
+  const contactRef = ref(db, `users/${uid}/emergencyContacts/${contactId}`);
+  return update(contactRef, {
+    name,
+    phoneNumber,
+    relationship,
+    priority,
+  });
+}
+export function deleteEmergencyContact(uid, contactId) {
+  const contactRef = ref(db, `users/${uid}/emergencyContacts/${contactId}`);
+  return remove(contactRef);
 }
