@@ -41,6 +41,17 @@ function TimelineItem({ event, isLast }) {
   );
 }
 
+// Builds a free, keyless OpenStreetMap embed URL centered on the given
+// coordinates. This replaces a Google Static Maps image -- that API
+// requires a billing-enabled key, the same kind of requirement we
+// avoided for Storage. This needs nothing from you to work.
+function buildMapEmbedUrl(lat, lng) {
+  if (typeof lat !== "number" || typeof lng !== "number") return null;
+  const delta = 0.006; // small bounding box around the point
+  const bbox = [lng - delta, lat - delta, lng + delta, lat + delta].join("%2C");
+  return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat}%2C${lng}`;
+}
+
 export default function Incidentdetailspanel({
   incident,
   isOpen,
@@ -49,6 +60,10 @@ export default function Incidentdetailspanel({
   onCallContacts,
   onEndIncident,
 }) {
+  const embedUrl = incident
+    ? buildMapEmbedUrl(incident.location?.lat, incident.location?.lng)
+    : null;
+
   return (
     <>
       <div
@@ -96,18 +111,35 @@ export default function Incidentdetailspanel({
                 </div>
               </div>
 
-              <div className="relative  h-48 rounded-2xl overflow-hidden border border-outline-variant shadow-sm group">
-                <div
-                  className="absolute inset-0  bg-cover bg-center transition-transform group-hover:scale-105"
-                  style={{
-                    backgroundImage: `url('${incident.location.mapImageUrl}')`,
-                  }}
-                />
-                <div className="absolute bottom-md left-md bg-surface/90 backdrop-blur px-sm py-xs rounded-lg text-label-sm font-bold shadow-sm">
-                  {incident.location.lat.toFixed(4)}° N,{" "}
-                  {incident.location.lng.toFixed(4)}° E
+              {embedUrl ? (
+                <div className="relative h-48 rounded-2xl overflow-hidden border border-outline-variant shadow-sm">
+                  <iframe
+                    title="Incident location"
+                    src={embedUrl}
+                    className="w-full h-full border-0"
+                    loading="lazy"
+                  />
+                  <div className="absolute bottom-md left-md bg-surface/90 backdrop-blur px-sm py-xs rounded-lg text-label-sm font-bold shadow-sm pointer-events-none">
+                    {incident.location.lat.toFixed(4)}° N,{" "}
+                    {incident.location.lng.toFixed(4)}° E
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="h-48 rounded-2xl border border-outline-variant flex items-center justify-center text-label-sm text-on-surface-variant">
+                  No location data for this incident.
+                </div>
+              )}
+
+              {incident.mapsLink && (
+                <a
+                  href={incident.mapsLink}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-label-sm text-primary font-bold hover:underline -mt-3"
+                >
+                  Open in Google Maps →
+                </a>
+              )}
 
               <div className="">
                 <h4 className="font-bold text-label-md text-on-surface-variant uppercase tracking-widest">
