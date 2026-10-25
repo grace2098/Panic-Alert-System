@@ -100,18 +100,14 @@ const Profiledets = () => {
       }
     }
 
-    if (emailChanged && reauthOk) {
-      try {
-        await verifyBeforeUpdateEmail(auth.currentUser, email.trim());
-        toast.success("Verification email sent to new address.");
-      } catch (err) {
-        toast.error(mapEmailError(err.code));
-      }
-    }
-
     setSubmitting(true);
     let reauthOk = true;
     if (emailChanged || wantsPasswordChange) {
+      if (!currentPassword) {
+        toast.error("Current password is required to change email or password.");
+        setSubmitting(false);
+        return;
+      }
       try {
         const credential = EmailAuthProvider.credential(
           originalEmail,
@@ -128,12 +124,13 @@ const Profiledets = () => {
 
     if (emailChanged && reauthOk) {
       try {
-        await updateEmail(auth.currentUser, email.trim());
-        toast.success("Email updated.");
+        await verifyBeforeUpdateEmail(auth.currentUser, email.trim());
+        toast.success("Verification email sent to new address.");
       } catch (err) {
         toast.error(mapEmailError(err.code));
       }
     }
+
     if (wantsPasswordChange && reauthOk) {
       try {
         await updatePassword(auth.currentUser, newPassword);

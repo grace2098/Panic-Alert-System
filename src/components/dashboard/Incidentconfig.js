@@ -1,18 +1,18 @@
 // Central display config for incident status + escalation levels.
 // Keeping this in one place means the table, filters, and details panel
 // can never drift out of sync on colors/labels.
- 
+
 export const STATUS = {
   active: {
     label: "Active",
     badgeClass: "bg-error-container text-on-error-container",
     dotClass: "bg-error animate-pulse-red",
   },
-  awaiting: {
-    label: "Awaiting",
-    badgeClass: "bg-tertiary-container text-on-tertiary-container",
-    dotClass: null,
-  },
+  // awaiting: {
+  //   label: "Awaiting",
+  //   badgeClass: "bg-tertiary-container text-on-tertiary-container",
+  //   dotClass: null,
+  // },
   acknowledged: {
     label: "Acknowledged",
     badgeClass: "bg-primary-container text-on-primary-container",
@@ -29,24 +29,29 @@ export const STATUS = {
     dotClass: null,
   },
 };
- 
+
 export const FILTERS = [
   { key: "all", label: "All" },
   { key: "active", label: "Active" },
-  { key: "awaiting", label: "Awaiting Response" },
+  // { key: "awaiting", label: "Awaiting Response" },
   { key: "acknowledged", label: "Acknowledged" },
   { key: "cancelled", label: "Cancelled" },
   { key: "escalated", label: "Escalated" },
 ];
- 
+
 export const ESCALATION_LABELS = {
   0: "Immediate Local Response",
   1: "Regional Security Dispatch",
   2: "Campus-Wide Alert",
 };
- 
+
 export function formatDateTime(isoString) {
-  const d = new Date(isoString);
+  if (!isoString) return "N/A";
+  // Support both milliseconds (standard JS / Firebase server timestamp) and seconds (legacy MCU epoch)
+  const numericTime = Number(isoString);
+  const d = !isNaN(numericTime) && numericTime < 10000000000
+    ? new Date(numericTime * 1000)
+    : new Date(isoString);
   const datePart = d.toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
@@ -59,4 +64,3 @@ export function formatDateTime(isoString) {
   });
   return `${datePart} · ${timePart}`;
 }
- 

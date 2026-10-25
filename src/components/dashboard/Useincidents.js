@@ -1,12 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ref, query, orderByChild, equalTo, onValue, update, push } from "firebase/database";
+import { ref, onValue, update, push, remove } from "firebase/database";
 import { db } from "../../lib/firebase";
 import { useAuth } from "../../context/AuthContext";
-
-// This is the real counterpart to the mock hook it replaced. Same public
-// shape (incidents, stats, loading, error, dispatchSecurity, callContacts,
-// endIncident) so nothing that consumes this hook needs to change --
-// only what happens inside it.
 
 export function Useincidents() {
   const { currentUser } = useAuth();
@@ -17,32 +12,38 @@ export function Useincidents() {
   useEffect(() => {
     if (!currentUser) return;
 
-    // Scoped to just this user's own incidents -- matches the security
-    // rules, which only ever grant read access to incidents you own.
-    const incidentsQuery = query(
-      ref(db, "incidents"),
-      orderByChild("userId"),
-      equalTo(currentUser.uid)
-    );
+    // Scoped directly to your UID node matching your security rules
+    const incidentsRef = ref(db, `incidents/${currentUser.uid}`);
 
     const unsubscribe = onValue(
-      incidentsQuery,
+      incidentsRef,
       (snapshot) => {
         const data = snapshot.val() || {};
-        const list = Object.entries(data).map(([id, incident]) => ({
-          id,
-          ...incident,
-          // Timeline is stored as an object of push-keyed entries (safer
-          // for concurrent writes than a raw array), converted here into
-          // a sorted array for the UI, ordered by when each event happened
-          // rather than by key -- so a manually-seeded test entry sorts
-          // correctly even if its key isn't a real push ID.
-          timeline: incident.timeline
+        const list = Object.entries(data).map(([id, incident]) => {
+          let timeline = incident.timeline
             ? Object.entries(incident.timeline)
                 .map(([entryId, entry]) => ({ id: entryId, ...entry }))
                 .sort((a, b) => (a.at || 0) - (b.at || 0))
-            : [],
-        }));
+            : [];
+
+          if (timeline.length === 0 && incident.createdAt) {
+            timeline = [
+              {
+                id: "initial_sos",
+                title: "SOS Alert Triggered",
+                description: `Alert sent from hardware device ${incident.deviceId || "SENT-001"}`,
+                state: "done",
+                at: incident.createdAt,
+              },
+            ];
+          }
+
+          return {
+            id,
+            ...incident,
+            timeline,
+          };
+        });
 
         list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
         setIncidents(list);
@@ -68,7 +69,7 @@ export function Useincidents() {
   }, [incidents]);
 
   const appendTimelineEvent = useCallback(async (incidentId, event) => {
-    const timelineRef = ref(db, `incidents/${incidentId}/timeline`);
+    const timelineRef = ref(db, `incidents/${currentUser.uid}/${incidentId}/timeline`);
     const newEntryRef = push(timelineRef);
     await update(newEntryRef, {
       at: Date.now(),
@@ -76,14 +77,11 @@ export function Useincidents() {
       description: event.description,
       state: "done",
     });
-  }, []);
+  }, [currentUser]);
 
   const updateStatus = useCallback(async (incidentId, nextStatus) => {
-    // A patch update on just the `status` child -- this only needs the
-    // write permission defined on that specific field in the rules, not
-    // permission over the whole incident node.
-    await update(ref(db, `incidents/${incidentId}`), { status: nextStatus });
-  }, []);
+    await update(ref(db, `incidents/${currentUser.uid}/${incidentId}`), { status: nextStatus });
+  }, [currentUser]);
 
   const dispatchSecurity = useCallback(
     async (incidentId) => {
@@ -113,6 +111,24 @@ export function Useincidents() {
     [updateStatus]
   );
 
+
+const cancelIncident = useCallback(
+    async (incidentId) => {
+      await updateStatus(incidentId, "cancelled");
+      await appendTimelineEvent(incidentId, {
+        title: "Incident Cancelled",
+        description: "The alert was cancelled by the user.",
+      });
+    },
+    [updateStatus, appendTimelineEvent]
+  );
+const deleteIncident = useCallback(
+    async (incidentId) => {
+      const incidentRef = ref(db, `incidents/${currentUser.uid}/${incidentId}`);
+      await remove(incidentRef);
+    },
+    [currentUser]
+  );
   return {
     incidents,
     stats,
@@ -120,6 +136,10 @@ export function Useincidents() {
     error,
     dispatchSecurity,
     callContacts,
-    endIncident,
+    cancelIncident, 
+    endIncident,     
+    updateStatus,   
+    deleteIncident
   };
+  
 }

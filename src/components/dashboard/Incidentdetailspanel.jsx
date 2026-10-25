@@ -1,4 +1,4 @@
-import { X, User, ShieldCheck, Phone, Octagon } from "lucide-react";
+import { X, User, CheckCircle2, Octagon } from "lucide-react";
 
 function UserAvatar({ user }) {
   if (user.photoURL) {
@@ -18,33 +18,29 @@ function UserAvatar({ user }) {
   );
 }
 
-function TimelineItem({ event, isLast }) {
-  const dotClass =
-    event.state === "pending"
-      ? "bg-surface-dim border-4 border-outline-variant"
-      : event.title.toLowerCase().includes("triggered")
-        ? "bg-error border-4 border-error-container"
-        : "bg-primary border-4 border-primary-fixed";
+// function TimelineItem({ event, isLast }) {
+//   const dotClass =
+//     event.state === "pending"
+//       ? "bg-surface-dim border-4 border-outline-variant"
+//       : event.title.toLowerCase().includes("triggered")
+//         ? "bg-error border-4 border-error-container"
+//         : "bg-primary border-4 border-primary-fixed";
 
-  return (
-    <div className={`relative pl-xl ${isLast ? "" : "pb-lg"}`}>
-      <div
-        className={`absolute left-0 top-1 w-4 h-4 rounded-full ${dotClass}`}
-      />
-      <p className="font-bold text-label-md text-on-surface">
-        {event.time ? `${event.time} - ${event.title}` : event.title}
-      </p>
-      <p className="text-label-sm text-on-surface-variant">
-        {event.description}
-      </p>
-    </div>
-  );
-}
+//   return (
+//     <div className={`relative pl-xl ${isLast ? "" : "pb-lg"}`}>
+//       <div
+//         className={`absolute left-0 top-1 w-4 h-4 rounded-full ${dotClass}`}
+//       />
+//       <p className="font-bold text-label-md text-on-surface">
+//         {event.time ? `${event.time} - ${event.title}` : event.title}
+//       </p>
+//       <p className="text-label-sm text-on-surface-variant">
+//         {event.description}
+//       </p>
+//     </div>
+//   );
+// }
 
-// Builds a free, keyless OpenStreetMap embed URL centered on the given
-// coordinates. This replaces a Google Static Maps image -- that API
-// requires a billing-enabled key, the same kind of requirement we
-// avoided for Storage. This needs nothing from you to work.
 function buildMapEmbedUrl(lat, lng) {
   if (typeof lat !== "number" || typeof lng !== "number") return null;
   const delta = 0.006; // small bounding box around the point
@@ -56,9 +52,8 @@ export default function Incidentdetailspanel({
   incident,
   isOpen,
   onClose,
-  onDispatchSecurity,
-  onCallContacts,
-  onEndIncident,
+  onAcknowledge,
+  onCancelIncident,
 }) {
   const embedUrl = incident
     ? buildMapEmbedUrl(incident.location?.lat, incident.location?.lng)
@@ -141,46 +136,22 @@ export default function Incidentdetailspanel({
                 </a>
               )}
 
-              <div className="">
-                <h4 className="font-bold text-label-md text-on-surface-variant uppercase tracking-widest">
-                  Incident Timeline
-                </h4>
-                <div className="relative pl-sm">
-                  <div className="absolute left-1.75 top-2 bottom-2 w-0.5 bg-outline-variant" />
-                  {incident.timeline.map((event, i) => (
-                    <TimelineItem
-                      key={event.id}
-                      event={event}
-                      isLast={i === incident.timeline.length - 1}
-                    />
-                  ))}
-                </div>
-              </div>
-
               <div className="grid grid-cols-2 gap-md pt-lg">
                 <button
                   type="button"
-                  onClick={() => onDispatchSecurity(incident.id)}
+                  onClick={() => onAcknowledge(incident.id)}
                   className="w-full py-md bg-primary text-on-primary font-bold rounded-lg hover:shadow-md transition-all active:scale-95 flex items-center justify-center gap-xs"
                 >
-                  <ShieldCheck className="w-4 h-4" />
-                  Dispatch Security
+                  <CheckCircle2 className="w-4 h-4" />
+                  Acknowledge
                 </button>
                 <button
                   type="button"
-                  onClick={() => onCallContacts(incident.id)}
-                  className="w-full py-md border border-primary text-primary font-bold rounded-lg hover:bg-primary-container/10 transition-all active:scale-95 flex items-center justify-center gap-xs"
-                >
-                  <Phone className="w-4 h-4" />
-                  Call Contacts
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onEndIncident(incident.id)}
-                  className="w-full py-md bg-error text-on-error font-bold rounded-lg hover:shadow-md transition-all active:scale-95 col-span-2 flex items-center justify-center gap-xs"
+                  onClick={() => onCancelIncident(incident.id)}
+                  className="w-full py-md bg-error text-on-error font-bold rounded-lg hover:shadow-md transition-all active:scale-95 flex items-center justify-center gap-xs"
                 >
                   <Octagon className="w-4 h-4" />
-                  End Incident
+                  Cancel Incident
                 </button>
               </div>
             </div>

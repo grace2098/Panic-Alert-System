@@ -6,11 +6,11 @@ import IncidentDetailsPanel from "../dashboard/Incidentdetailspanel";
 import { Useincidents } from "../dashboard/Useincidents";
 import { formatDateTime } from "../dashboard/Incidentconfig";
 import { useAuth } from "../../context/AuthContext";
-import { getUserProfile } from "../../lib/userService";
+import { getUserProfile } from "../../lib/Userservice";
 
 export default function Dashboardcontainer() {
   const { currentUser } = useAuth();
-  const { incidents, stats, dispatchSecurity, callContacts, endIncident } = Useincidents();
+const { incidents, stats, updateStatus, deleteIncident } = Useincidents();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
@@ -18,8 +18,6 @@ export default function Dashboardcontainer() {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [profile, setProfile] = useState(null);
 
-  // Loaded once so the details panel can show who "you" are without
-  // duplicating name/photo data onto every single incident record.
   useEffect(() => {
     if (!currentUser) return;
     getUserProfile(currentUser.uid)
@@ -42,9 +40,6 @@ export default function Dashboardcontainer() {
     });
   }, [incidents, activeFilter, searchTerm]);
 
-  // The signed-in user is always "the user" for every incident on this
-  // page, so their profile is merged in here rather than expected to
-  // live on the incident record itself.
   const selectedIncident = useMemo(() => {
     const incident = incidents.find((i) => i.id === selectedIncidentId);
     if (!incident) return null;
@@ -79,15 +74,14 @@ export default function Dashboardcontainer() {
         onFilterChange={setActiveFilter}
       />
 
-      <IncidentTable incidents={filteredIncidents} onViewIncident={handleViewIncident} />
+      <IncidentTable incidents={filteredIncidents} onViewIncident={handleViewIncident} onDeleteIncident={deleteIncident}/>
 
       <IncidentDetailsPanel
         incident={selectedIncident}
         isOpen={isPanelOpen}
         onClose={handleClosePanel}
-        onDispatchSecurity={dispatchSecurity}
-        onCallContacts={callContacts}
-        onEndIncident={endIncident}
+        onAcknowledge={(id) => updateStatus(id, "acknowledged")}
+        onCancelIncident={(id) => updateStatus(id, "cancelled")}
       />
     </main>
   );
