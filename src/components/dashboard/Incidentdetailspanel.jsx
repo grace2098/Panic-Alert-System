@@ -1,16 +1,15 @@
 import { X, User, CheckCircle2, Octagon } from "lucide-react";
 
 function UserAvatar({ user }) {
-  if (user.photoURL) {
+  if (user && user.photoURL) {
     return (
       <img
         src={user.photoURL}
-        alt={user.name}
+        alt={user.name || "User"}
         className="w-12 h-12 rounded-full object-cover border border-outline-variant"
       />
     );
   }
-  // No uploaded photo yet — fall back to an icon avatar rather than a broken image.
   return (
     <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
       <User className="w-6 h-6 text-primary" />
@@ -18,28 +17,49 @@ function UserAvatar({ user }) {
   );
 }
 
-// function TimelineItem({ event, isLast }) {
-//   const dotClass =
-//     event.state === "pending"
-//       ? "bg-surface-dim border-4 border-outline-variant"
-//       : event.title.toLowerCase().includes("triggered")
-//         ? "bg-error border-4 border-error-container"
-//         : "bg-primary border-4 border-primary-fixed";
+function TimelineItem({ event, isLast }) {
+  const isTriggered = event.title?.toLowerCase().includes("triggered");
+  const isAck = event.title?.toLowerCase().includes("acknowledged");
+  const isCancelled = event.title?.toLowerCase().includes("cancelled");
 
-//   return (
-//     <div className={`relative pl-xl ${isLast ? "" : "pb-lg"}`}>
-//       <div
-//         className={`absolute left-0 top-1 w-4 h-4 rounded-full ${dotClass}`}
-//       />
-//       <p className="font-bold text-label-md text-on-surface">
-//         {event.time ? `${event.time} - ${event.title}` : event.title}
-//       </p>
-//       <p className="text-label-sm text-on-surface-variant">
-//         {event.description}
-//       </p>
-//     </div>
-//   );
-// }
+  const dotClass = isTriggered
+    ? "bg-error border-error-container"
+    : isAck
+    ? "bg-primary border-primary-fixed"
+    : isCancelled
+    ? "bg-surface-variant border-outline"
+    : "bg-tertiary border-tertiary-fixed";
+
+  const timeFormatted = event.at
+    ? new Date(event.at).toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      })
+    : "";
+
+  return (
+    <div className={`relative pl-6 ${isLast ? "" : "pb-5 border-l-2 border-outline-variant ml-2"}`}>
+      <div
+        className={`absolute -left-[5px] top-1 w-3 h-3 rounded-full border-2 ${dotClass}`}
+      />
+      <div className="flex items-center justify-between gap-2">
+        <p className="font-bold text-label-md text-on-surface">
+          {event.title}
+        </p>
+        {timeFormatted && (
+          <span className="text-label-sm text-on-surface-variant font-mono">
+            {timeFormatted}
+          </span>
+        )}
+      </div>
+      <p className="text-label-sm text-on-surface-variant mt-0.5">
+        {event.description}
+      </p>
+    </div>
+  );
+}
 
 function buildMapEmbedUrl(lat, lng) {
   if (typeof lat !== "number" || typeof lng !== "number") return null;
@@ -63,7 +83,7 @@ export default function Incidentdetailspanel({
     <>
       <div
         onClick={onClose}
-        className={`w-full fixed inset-0 bg-on-background/40 backdrop-blur-sm z-60 transition-opacity  overflow-hidden duration-300 ${
+        className={`w-full fixed inset-0 bg-on-background/40 backdrop-blur-sm z-60 transition-opacity overflow-hidden duration-300 ${
           isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
       />
@@ -98,13 +118,32 @@ export default function Incidentdetailspanel({
                 <UserAvatar user={incident.user} />
                 <div>
                   <p className="font-bold text-on-surface">
-                    {incident.user.name}
+                    {incident.user?.name || "Device Wearer"}
                   </p>
                   <p className="text-label-sm text-on-surface-variant">
-                    Device: {incident.deviceId} • {incident.user.department}
+                    Device: {incident.deviceId} • {incident.user?.department || "Campus User"}
                   </p>
                 </div>
               </div>
+
+              {incident.acknowledgedBy && (
+                <div className="bg-primary/10 border border-primary/30 p-md rounded-xl flex flex-col gap-1">
+                  <div className="flex items-center gap-xs text-primary font-bold text-label-md">
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>Acknowledged by {incident.acknowledgedBy}</span>
+                  </div>
+                  {incident.acknowledgedPhone && (
+                    <p className="text-label-sm text-on-surface-variant">
+                      Phone: <span className="font-mono">{incident.acknowledgedPhone}</span>
+                    </p>
+                  )}
+                  {incident.acknowledgedText && (
+                    <p className="text-label-sm text-on-surface italic mt-0.5">
+                      Reply: "{incident.acknowledgedText}"
+                    </p>
+                  )}
+                </div>
+              )}
 
               {embedUrl ? (
                 <div className="relative h-48 rounded-2xl overflow-hidden border border-outline-variant shadow-sm">
@@ -115,8 +154,8 @@ export default function Incidentdetailspanel({
                     loading="lazy"
                   />
                   <div className="absolute bottom-md left-md bg-surface/90 backdrop-blur px-sm py-xs rounded-lg text-label-sm font-bold shadow-sm pointer-events-none">
-                    {incident.location.lat.toFixed(4)}° N,{" "}
-                    {incident.location.lng.toFixed(4)}° E
+                    {incident.location?.lat?.toFixed(4)}° N,{" "}
+                    {incident.location?.lng?.toFixed(4)}° E
                   </div>
                 </div>
               ) : (
@@ -136,7 +175,32 @@ export default function Incidentdetailspanel({
                 </a>
               )}
 
-              <div className="grid grid-cols-2 gap-md pt-lg">
+              {/* Real-time Timeline Section */}
+              <div className="pt-2">
+                <h4 className="font-bold text-title-sm text-on-surface mb-3 flex items-center justify-between">
+                  <span>Incident Timeline & Logs</span>
+                  <span className="text-label-sm font-normal text-on-surface-variant">
+                    {incident.timeline?.length || 0} event{(incident.timeline?.length === 1) ? "" : "s"}
+                  </span>
+                </h4>
+                {incident.timeline && incident.timeline.length > 0 ? (
+                  <div className="py-2">
+                    {incident.timeline.map((event, idx) => (
+                      <TimelineItem
+                        key={event.id || idx}
+                        event={event}
+                        isLast={idx === incident.timeline.length - 1}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-label-sm text-on-surface-variant italic">
+                    No timeline entries recorded yet.
+                  </p>
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-md pt-lg border-t border-outline-variant">
                 <button
                   type="button"
                   onClick={() => onAcknowledge(incident.id)}

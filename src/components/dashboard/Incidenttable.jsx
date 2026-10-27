@@ -6,7 +6,7 @@ import {
 } from "../dashboard/Incidentconfig";
 
 function StatusBadge({ status }) {
-  const config = STATUS[status];
+  const config = STATUS[status] || STATUS.active;
   return (
     <span
       className={`inline-flex items-center gap-xs px-md py-xs rounded-full text-label-sm font-bold ${config.badgeClass}`}
@@ -89,6 +89,11 @@ export default function IncidentTable({
                 </td>
                 <td className="px-lg py-lg">
                   <StatusBadge status={incident.status} />
+                  {incident.acknowledgedBy && (
+                    <span className="text-label-sm text-primary font-medium block mt-1">
+                      by {incident.acknowledgedBy}
+                    </span>
+                  )}
                 </td>
                 <td className="px-lg py-lg">
                   <div className="flex flex-col min-w-0 max-w-40 whitespace-normal wrap-break-word">
