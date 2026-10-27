@@ -16,7 +16,6 @@ const Footer = () => {
           Terms of Service
         </button>
         <a href="mailto:olachi@gmail.com" className="hover:underline">Contact Us</a>
-        <p>About Us</p>
       </div>
 
       {showTerms && <TermsModal onClose={() => setShowTerms(false)} />}
