@@ -25,10 +25,10 @@ function TimelineItem({ event, isLast }) {
   const dotClass = isTriggered
     ? "bg-error border-error-container"
     : isAck
-    ? "bg-primary border-primary-fixed"
-    : isCancelled
-    ? "bg-surface-variant border-outline"
-    : "bg-tertiary border-tertiary-fixed";
+      ? "bg-primary border-primary-fixed"
+      : isCancelled
+        ? "bg-surface-variant border-outline"
+        : "bg-tertiary border-tertiary-fixed";
 
   const timeFormatted = event.at
     ? new Date(event.at).toLocaleTimeString("en-US", {
@@ -40,14 +40,14 @@ function TimelineItem({ event, isLast }) {
     : "";
 
   return (
-    <div className={`relative pl-6 ${isLast ? "" : "pb-5 border-l-2 border-outline-variant ml-2"}`}>
+    <div
+      className={`relative pl-6 ${isLast ? "" : "pb-5 border-l-2 border-outline-variant ml-2"}`}
+    >
       <div
         className={`absolute -left-[5px] top-1 w-3 h-3 rounded-full border-2 ${dotClass}`}
       />
       <div className="flex items-center justify-between gap-2">
-        <p className="font-bold text-label-md text-on-surface">
-          {event.title}
-        </p>
+        <p className="font-bold text-label-md text-on-surface">{event.title}</p>
         {timeFormatted && (
           <span className="text-label-sm text-on-surface-variant font-mono">
             {timeFormatted}
@@ -121,7 +121,8 @@ export default function Incidentdetailspanel({
                     {incident.user?.name || "Device Wearer"}
                   </p>
                   <p className="text-label-sm text-on-surface-variant">
-                    Device: {incident.deviceId} • {incident.user?.department || "Campus User"}
+                    Device: {incident.deviceId} •{" "}
+                    {incident.user?.department || "Campus User"}
                   </p>
                 </div>
               </div>
@@ -134,7 +135,10 @@ export default function Incidentdetailspanel({
                   </div>
                   {incident.acknowledgedPhone && (
                     <p className="text-label-sm text-on-surface-variant">
-                      Phone: <span className="font-mono">{incident.acknowledgedPhone}</span>
+                      Phone:{" "}
+                      <span className="font-mono">
+                        {incident.acknowledgedPhone}
+                      </span>
                     </p>
                   )}
                   {incident.acknowledgedText && (
@@ -180,7 +184,8 @@ export default function Incidentdetailspanel({
                 <h4 className="font-bold text-title-sm text-on-surface mb-3 flex items-center justify-between">
                   <span>Incident Timeline & Logs</span>
                   <span className="text-label-sm font-normal text-on-surface-variant">
-                    {incident.timeline?.length || 0} event{(incident.timeline?.length === 1) ? "" : "s"}
+                    {incident.timeline?.length || 0} event
+                    {incident.timeline?.length === 1 ? "" : "s"}
                   </span>
                 </h4>
                 {incident.timeline && incident.timeline.length > 0 ? (
