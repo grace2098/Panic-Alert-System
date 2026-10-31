@@ -1,6 +1,6 @@
 import { Hand, Send, CloudUpload, ClipboardList, ShieldCheck, Radio } from "lucide-react";
 const VITALS_IMG =
-  "/public/Education concept smiling black female student showing thumb up while posing outdoors _ Premium Photo.jpg";
+  "/Education concept smiling black female student showing thumb up while posing outdoors _ Premium Photo.jpg";
 
 const steps = [
   {

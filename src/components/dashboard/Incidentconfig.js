@@ -1,6 +1,4 @@
-// Central display config for incident status + escalation levels.
-// Keeping this in one place means the table, filters, and details panel
-// can never drift out of sync on colors/labels.
+
 
 export const STATUS = {
   active: {
