@@ -45,7 +45,7 @@ const ContactsModal = ({ onClose, contactToEdit = null }) => {
           name: name.trim(),
           phoneNumber: phoneNumber.trim(),
           relationship: relationship.trim(),
-          priority,
+          priority: Number(priority), // MUST be a number per rules
         });
         toast.success("Contact updated.");
       } else {
@@ -53,7 +53,8 @@ const ContactsModal = ({ onClose, contactToEdit = null }) => {
           name: name.trim(),
           phoneNumber: phoneNumber.trim(),
           relationship: relationship.trim(),
-          priority,
+          priority: Number(priority), // MUST be a number per rules
+          addedAt: Date.now(),       // Required by rule validation
         });
         toast.success(`${name.trim()} added as ${label} priority.`);
       }

@@ -7,6 +7,7 @@ import Profile from "./pages/Profile";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import LoginPage from "./pages/LoginPage";
+import Landing from "./pages/Landing";
 
 const App = () => {
   return (
@@ -14,8 +15,7 @@ const App = () => {
       <AuthProvider>
       <Toaster />
       <Routes>
-        <Route path="/" element={<Signup />} />
-        
+        <Route path="/" element={<Landing />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<Signup />} />
         <Route
